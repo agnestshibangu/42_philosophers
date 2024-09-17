@@ -24,8 +24,6 @@ $(NAME): $(OBJS)
 	@echo "  "
 	@echo "  "
 
-
-
 clean:
 	@echo "🧹 ALL FILES HAVE BEEN DELETED 🧹"
 	rm -rf $(DIR_OBJ)
