@@ -38,7 +38,7 @@ typedef struct		s_table
 	int 	time_to_die;
 	int 	time_to_eat;
 	int 	time_to_sleep;
-	int		nb_of_time_eating;
+	int		number_of_times_each_philosopher_must_eat;
 	int 	smbd_has_died;
 	int 	all_ate;
 	t_philo		philosophers[250];
@@ -49,10 +49,20 @@ typedef struct		s_table
 	
 }					t_table;
 
+typedef struct s_thread_args
+{
+	t_philo	*philo;
+	t_table	*table;
+}	t_thread_args;
+
 int	ft_atoi(char *str);
 char	*ft_itoa(int n);
 char	*ft_strjoin(char const *s1, char const *s2);
 size_t	ft_strlen(const char *s);
+void 	*philo_routine(t_table *table);
+int 	init_mutex(t_table *table);
+int 	init_all_philosophers(t_table *table);
+void 	init_table(t_table *table, char **av);
 // static size_t	calculate_size(long number);
 
 
