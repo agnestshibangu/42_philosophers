@@ -40,12 +40,12 @@ int main(int ac, char **av)
 	init_all_philosophers(&table);
 	init_mutex(&table);
 
-	int i = 0;
+	// int i = 0;
 
-	while (i < table.nb_philo)
-	{
-		pthread_join(table.philosophers[i].thread_id, NULL);
-	}
+	// while (i < table.nb_philo)
+	// {
+	// 	pthread_join(table.philosophers[i].thread_id, NULL);
+	// }
 	
 	return (0);
 }
