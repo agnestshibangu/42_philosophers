@@ -6,7 +6,7 @@
 /*   By: agtshiba <agtshiba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 16:16:50 by agtshiba          #+#    #+#             */
-/*   Updated: 2024/09/16 18:28:50 by agtshiba         ###   ########.fr       */
+/*   Updated: 2024/09/19 14:33:48 by agtshiba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,4 +121,12 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	}
 	str[j] = 0;
 	return (str);
+}
+
+long long	timestamp(void)
+{
+	struct timeval	t;
+
+	gettimeofday(&t, NULL);
+	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
 }

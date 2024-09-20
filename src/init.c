@@ -1,7 +1,8 @@
 #include "../philo.h"
 
+
 void 	*p_thread(void *void_args)
-{	
+{
 	int i;
 	t_table 	*table;
 	t_thread_args	*args;
@@ -12,47 +13,74 @@ void 	*p_thread(void *void_args)
 	table = args->table;
 	philo = args->philo;
 
-    // printf("je suis dans le thread\n\n");
-	
-	if (philo->id % 2 == 0)
+	philo_eat(*table, *philo);
+
+	free(args);
+	return (NULL);
+}
+
+void 	*philo_eat(t_table table, t_philo philo)
+{	
+
+	if (philo.id % 2 == 0)
 	{
 		usleep(1000);
 		// FOURCHETTE DE DROITE
-		pthread_mutex_lock(&(table->forks[philo->right_fork_id]));
+		pthread_mutex_lock(&(table.forks[philo.right_fork_id]));
 		
-		pthread_mutex_lock(&(table->writing));
-		printf("philo number %d a la fourchette DROITE n %d\n", philo->id, philo->right_fork_id);
-		pthread_mutex_unlock(&(table->writing));
+		pthread_mutex_lock(&(table.writing));
+		printf("philo number %d a la fourchette DROITE n %d\n", philo.id, philo.right_fork_id);
+		pthread_mutex_unlock(&(table.writing));
 
 		// FOURCHETTE DE GAUCHE
-		pthread_mutex_lock(&(table->forks[philo->left_fork_id]));
+		pthread_mutex_lock(&(table.forks[philo.left_fork_id]));
 
-		pthread_mutex_lock(&(table->writing));
-		printf("philo number %d a la fourchette GAUCHE n %d\n", philo->id, philo->left_fork_id);
-		pthread_mutex_unlock(&(table->writing));
+		pthread_mutex_lock(&(table.writing));
+		printf("philo number %d a la fourchette GAUCHE n %d\n", philo.id, philo.left_fork_id);
+		printf("philo number %d is eating\n\n", philo.id);
+		pthread_mutex_lock(&(table.meal_check));
+		philo.time_of_last_meal = timestamp();
+		philo.how_many_times_eat += 1;
+		pthread_mutex_unlock(&(table.meal_check));
+		pthread_mutex_unlock(&(table.writing));
+
+		pthread_mutex_lock(&(table.writing));
+		printf("philo number %d has eat %d\n", philo.id, philo.how_many_times_eat);
+		pthread_mutex_unlock(&(table.writing));
+
+
+
 	}
-	else if (philo->id == table->nb_philo - 1 || philo->id % 2 != 0)
+	else if (philo.id == table.nb_philo - 1 || philo.id % 2 != 0)
 	{
 		// FOURCHETTE DE GAUCHE
-		pthread_mutex_lock(&(table->forks[philo->left_fork_id]));
+		pthread_mutex_lock(&(table.forks[philo.left_fork_id]));
 
-		pthread_mutex_lock(&(table->writing));
-		printf("philo number %d a la fourchette GAUCHE n %d\n", philo->id, philo->left_fork_id);
-		pthread_mutex_unlock(&(table->writing));
+		pthread_mutex_lock(&(table.writing));
+		printf("philo number %d a la fourchette GAUCHE n %d\n", philo.id, philo.left_fork_id);
+		pthread_mutex_unlock(&(table.writing));
 
 		// FOURCHETTE DE DROITE
-		pthread_mutex_lock(&(table->forks[philo->right_fork_id]));
+		pthread_mutex_lock(&(table.forks[philo.right_fork_id]));
 		
-		pthread_mutex_lock(&(table->writing));
-		printf("philo number %d a la fourchette DROITE n %d\n", philo->id, philo->right_fork_id);
-		pthread_mutex_unlock(&(table->writing));
+		pthread_mutex_lock(&(table.writing));
+		printf("philo number %d a la fourchette DROITE n %d\n", philo.id, philo.right_fork_id);
+		printf("philo number %d is eating\n\n", philo.id);
+		pthread_mutex_lock(&(table.meal_check));
+		philo.how_many_times_eat = timestamp();
+		philo.how_many_times_eat += 1;
+		pthread_mutex_unlock(&(table.meal_check));
+		pthread_mutex_unlock(&(table.writing));
+
+		pthread_mutex_lock(&(table.writing));
+		printf("philo number %d has eat %d\n", philo.id, philo.how_many_times_eat);
+		pthread_mutex_unlock(&(table.writing));
 	}
 
 	// // UNLOCK FOURCHETTE
 	// pthread_mutex_unlock(&(table->forks[philo->left_fork_id]));
 	// pthread_mutex_unlock(&(table->forks[philo->left_fork_id]));
 
-	free(args);
 	return (NULL);
 }
 
