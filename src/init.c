@@ -121,12 +121,11 @@ int 	init_all_philosophers(t_table *table)
 {
 	int i;
 	char *tab;
-    t_thread_args *thread_args;  // Pointer to dynamically allocate args per thread
+    t_thread_args *thread_args;
 
 	i = 0;
 	tab = "threadid";
 
-	// on cree chaque philo a partir de la structure
 	while (i < table->nb_philo)
 	{
 		table->philosophers[i].id = i + 1;
@@ -135,11 +134,8 @@ int 	init_all_philosophers(t_table *table)
 		table->philosophers[i].left_fork_id = (i + 1) % table->nb_philo;
 		table->philosophers[i].time_of_last_meal = 0;
 		table->philosophers[i].thread_id_name = ft_strjoin(tab, ft_itoa(i));
-		// printf("one philo has been created ! \n");
 		i++;
 	}
-
-	// pour chaque philo on lance un thread
     i = 0;
 	while (i < table->nb_philo)
     {
