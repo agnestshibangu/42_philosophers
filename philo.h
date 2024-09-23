@@ -6,7 +6,7 @@
 /*   By: agtshiba <agtshiba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:46:37 by agtshiba          #+#    #+#             */
-/*   Updated: 2024/09/19 15:04:49 by agtshiba         ###   ########.fr       */
+/*   Updated: 2024/09/23 11:51:17 by agtshiba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ size_t	ft_strlen(const char *s);
 void 	*philo_routine(t_table *table);
 int 	init_mutex(t_table *table);
 int 	init_all_philosophers(t_table *table);
-void 	*philo_eat(t_table table, t_philo philo);
+void 	*philo_eat(t_table *table, t_philo *philo);
 void 	init_table(t_table *table, char **av);
 long long	timestamp(void);
 // static size_t	calculate_size(long number);
