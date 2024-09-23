@@ -12,47 +12,16 @@ void 	*p_thread(void *void_args)
 	table = args->table;
 	philo = args->philo;
 
-	// if (philo->id % 2 != 0)
-	// 	usleep(15000);
-	while (i < 6)
+	while (i < table->number_of_times_each_philosopher_must_eat)
 	{
 		philo_eat(table, philo);
-		usleep(15000);
+		philo_sleep(table, philo);
+		philo_think(table, philo);
 		i++;
-	}
-
-	
+	}	
 	free(args);
 	return (NULL);
 }
-
-// void 	*philo_eat(t_table table, t_philo philo)
-// {
-// 	pthread_mutex_lock(&(table.forks[philo.left_fork_id]));
-// 	pthread_mutex_lock(&(table.writing));
-// 	printf("philo number %d a la fourchette GAUCHE n %d\n", philo.id, philo.left_fork_id);
-// 	pthread_mutex_unlock(&(table.writing));
-
-// 	pthread_mutex_lock(&(table.forks[philo.right_fork_id]));
-
-// 	pthread_mutex_lock(&(table.writing));
-// 	printf("philo number %d a la fourchette DROITE n %d\n", philo.id, philo.right_fork_id);
-// 	pthread_mutex_unlock(&(table.writing));
-
-// 	pthread_mutex_lock(&(table.meal_check));
-
-// 	pthread_mutex_lock(&(table.writing));
-// 	printf("philo number %d is eating\n", philo.id);
-// 	pthread_mutex_unlock(&(table.writing));
-
-// 	philo.time_of_last_meal = timestamp();
-// 	pthread_mutex_unlock(&(table.meal_check));
-// 	philo.how_many_times_eat += 1;
-// 	pthread_mutex_unlock(&(table.forks[philo.left_fork_id]));
-// 	pthread_mutex_unlock(&(table.forks[philo.right_fork_id]));
-
-// 	return (NULL);
-// }
 
 void 	*philo_eat(t_table *table, t_philo *philo)
 {	
@@ -79,7 +48,7 @@ void 	*philo_eat(t_table *table, t_philo *philo)
 		pthread_mutex_unlock(&(table->meal_check));
 
 		pthread_mutex_lock(&(table->writing));
-		printf("philo number %d has eat %d\n\n", philo->id, philo->how_many_times_eat);
+		printf("philo number %d has eat %d times \n", philo->id, philo->how_many_times_eat);
 		pthread_mutex_unlock(&(table->writing));
 
 	}
@@ -106,96 +75,29 @@ void 	*philo_eat(t_table *table, t_philo *philo)
 		pthread_mutex_unlock(&(table->meal_check));
 		
 		pthread_mutex_lock(&(table->writing));
-		printf("philo number %d has eat %d\n\n", philo->id, philo->how_many_times_eat);
+		printf("philo number %d has eat %d times\n", philo->id, philo->how_many_times_eat);
 		pthread_mutex_unlock(&(table->writing));
 	}
-
-	// // UNLOCK FOURCHETTE
-	// pthread_mutex_unlock(&(table->forks[philo->left_fork_id]));
-	// pthread_mutex_unlock(&(table->forks[philo->left_fork_id]));
-
 	return (NULL);
 }
 
 
 
+void		philo_sleep(t_table *table, t_philo *philo)
+{
+	pthread_mutex_lock(&(table->writing));
+	printf("philo number %d is sleeping 🛏\n\n", philo->id);
+	pthread_mutex_unlock(&(table->writing));
+	usleep(1500000);
+}
 
+void		philo_think(t_table *table, t_philo *philo)
+{
+	pthread_mutex_lock(&(table->writing));
+	printf("philo number %d is thinking 🧘\n\n", philo->id);
+	pthread_mutex_unlock(&(table->writing));
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-// void 	*philo_eat(t_table *table, t_philo *philo)
-// {	
-
-// 	if (philo.id % 2 == 0)
-// 	{
-// 		// FOURCHETTE DE DROITE
-// 		pthread_mutex_lock(&(table.forks[philo.right_fork_id]));
-// 		pthread_mutex_lock(&(table.writing));
-// 		printf("philo number %d a la fourchette DROITE n %d\n", philo.id, philo.right_fork_id);
-// 		pthread_mutex_unlock(&(table.writing));
-// 		pthread_mutex_unlock(&(table.forks[philo.right_fork_id]));
-
-// 		// FOURCHETTE DE GAUCHE
-// 		pthread_mutex_lock(&(table.forks[philo.left_fork_id]));
-// 		pthread_mutex_lock(&(table.writing));
-// 		printf("philo number %d a la fourchette GAUCHE n %d\n", philo.id, philo.left_fork_id);
-// 		printf("philo number %d is eating\n", philo.id);
-// 		pthread_mutex_unlock(&(table.writing));
-		
-// 		pthread_mutex_lock(&(table.meal_check));
-// 		philo.time_of_last_meal = timestamp();
-// 		philo.how_many_times_eat += 1;
-// 		pthread_mutex_unlock(&(table.meal_check));
-// 		pthread_mutex_unlock(&(table.forks[philo.left_fork_id]));
-
-// 		pthread_mutex_lock(&(table.writing));
-// 		printf("philo number %d has eat %d\n\n", philo.id, philo.how_many_times_eat);
-// 		pthread_mutex_unlock(&(table.writing));
-
-// 	}
-// 	else if (philo.id == table.nb_philo - 1 || philo.id % 2 != 0)
-// 	{
-// 		// FOURCHETTE DE GAUCHE
-// 		pthread_mutex_lock(&(table.forks[philo.left_fork_id]));
-// 		pthread_mutex_lock(&(table.writing));
-// 		printf("philo number %d a la fourchette GAUCHE n %d\n", philo.id, philo.left_fork_id);
-// 		pthread_mutex_unlock(&(table.writing));
-// 		pthread_mutex_unlock(&(table.forks[philo.left_fork_id]));
-
-// 		// FOURCHETTE DE DROITE
-// 		pthread_mutex_lock(&(table.forks[philo.right_fork_id]));
-// 		pthread_mutex_lock(&(table.writing));
-// 		printf("philo number %d a la fourchette DROITE n %d\n", philo.id, philo.right_fork_id);
-// 		printf("philo number %d is eating\n", philo.id);
-// 		pthread_mutex_unlock(&(table.writing));
-// 		pthread_mutex_lock(&(table.meal_check));
-// 		philo.time_of_last_meal = timestamp();
-// 		philo.how_many_times_eat += 1;
-// 		pthread_mutex_unlock(&(table.meal_check));
-// 		pthread_mutex_unlock(&(table.forks[philo.left_fork_id]));
-// 		// pthread_mutex_unlock(&(table.forks[philo.right_fork_id]));
-// 		pthread_mutex_lock(&(table.writing));
-// 		printf("philo number %d has eat %d\n\n", philo.id, philo.how_many_times_eat);
-// 		pthread_mutex_unlock(&(table.writing));
-// 	}
-
-// 	// // UNLOCK FOURCHETTE
-// 	// pthread_mutex_unlock(&(table.forks[philo.left_fork_id]));
-// 	// pthread_mutex_unlock(&(table.forks[philo.left_fork_id]));
-
-// 	return (NULL);
-// }
 
 int 	init_mutex(t_table *table)
 {
@@ -227,7 +129,7 @@ int 	init_all_philosophers(t_table *table)
 	// on cree chaque philo a partir de la structure
 	while (i < table->nb_philo)
 	{
-		table->philosophers[i].id = i;
+		table->philosophers[i].id = i + 1;
 		table->philosophers[i].how_many_times_eat = 0;
 		table->philosophers[i].right_fork_id = i;
 		table->philosophers[i].left_fork_id = (i + 1) % table->nb_philo;
@@ -259,7 +161,7 @@ int 	init_all_philosophers(t_table *table)
 	for (i = 0; i < table->nb_philo; i++) {
         pthread_join(table->philosophers[i].thread_id, NULL);
     }
-    printf("j ai reussi a lancer tous les threads");
+    printf("threads terminated");
     return (0);
 }
 

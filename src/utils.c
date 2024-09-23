@@ -6,7 +6,7 @@
 /*   By: agtshiba <agtshiba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 16:16:50 by agtshiba          #+#    #+#             */
-/*   Updated: 2024/09/19 14:33:48 by agtshiba         ###   ########.fr       */
+/*   Updated: 2024/09/23 16:42:44 by agtshiba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,4 +129,52 @@ long long	timestamp(void)
 
 	gettimeofday(&t, NULL);
 	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
+}
+
+// void 	print_starting_time(void)
+// {
+// 	printf("the starting time is : %lld\n\n\n", timestamp());
+// }
+
+void print_starting_time(void)
+{
+	time_t raw_time;
+	struct tm *time_info;
+	char buffer[80];
+
+	time(&raw_time);
+	time_info = localtime(&raw_time);
+	strftime(buffer, 80, "%H:%M:%S - %d/%m/%Y", time_info);
+	printf("Le programme a commencé à : %s\n\n", buffer);
+}
+
+
+void print_finishing_time(void)
+{
+	time_t raw_time;
+	struct tm *time_info;
+	char buffer[80];
+
+	time(&raw_time);
+	time_info = localtime(&raw_time);
+	strftime(buffer, 80, "%H:%M:%S - %d/%m/%Y", time_info);
+	printf("Le programme a terminé à : %s\n", buffer);
+}
+
+long long 	time_diff(long long past, long long present)
+{
+	return (present - past);
+}
+
+void	smart_sleep(long long time, t_table *table)
+{
+	long long i;
+	
+	i = timestamp();
+	while (!(table->smbd_has_died))
+	{
+		if (time_diff(i, timestamp()) >= time)
+			break;
+		usleep(50);
+	}
 }
