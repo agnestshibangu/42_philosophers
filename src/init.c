@@ -12,8 +12,10 @@ void 	*p_thread(void *void_args)
 	table = args->table;
 	philo = args->philo;
 
-	while (i < table->number_of_times_each_philosopher_must_eat)
+	while (i < table->number_of_times_each_philosopher_must_eat && !(table->smbd_has_died))
 	{
+		if ((table->smbd_has_died) || (table->all_ate))
+			break;
 		philo_eat(table, philo);
 		philo_sleep(table, philo);
 		philo_think(table, philo);
@@ -32,7 +34,6 @@ void 	*philo_eat(t_table *table, t_philo *philo)
 		pthread_mutex_lock(&(table->writing));
 		printf("philo number %d a la fourchette DROITE n %d\n", philo->id, philo->right_fork_id);
 		pthread_mutex_unlock(&(table->writing));
-		pthread_mutex_unlock(&(table->forks[philo->right_fork_id]));
 
 		// FOURCHETTE DE GAUCHE
 		pthread_mutex_lock(&(table->forks[philo->left_fork_id]));
@@ -40,6 +41,7 @@ void 	*philo_eat(t_table *table, t_philo *philo)
 		printf("philo number %d a la fourchette GAUCHE n %d\n", philo->id, philo->left_fork_id);
 		printf("philo number %d is eating\n", philo->id);
 		pthread_mutex_unlock(&(table->writing));
+		pthread_mutex_unlock(&(table->forks[philo->right_fork_id]));
 		pthread_mutex_unlock(&(table->forks[philo->left_fork_id]));
 		
 		pthread_mutex_lock(&(table->meal_check));
@@ -59,7 +61,6 @@ void 	*philo_eat(t_table *table, t_philo *philo)
 		pthread_mutex_lock(&(table->writing));
 		printf("philo number %d a la fourchette GAUCHE n %d\n", philo->id, philo->left_fork_id);
 		pthread_mutex_unlock(&(table->writing));
-		pthread_mutex_unlock(&(table->forks[philo->left_fork_id]));
 
 		// FOURCHETTE DE DROITE
 		pthread_mutex_lock(&(table->forks[philo->right_fork_id]));
@@ -67,6 +68,7 @@ void 	*philo_eat(t_table *table, t_philo *philo)
 		printf("philo number %d a la fourchette DROITE n %d\n", philo->id, philo->right_fork_id);
 		printf("philo number %d is eating\n", philo->id);
 		pthread_mutex_unlock(&(table->writing));
+		pthread_mutex_unlock(&(table->forks[philo->left_fork_id]));
 		pthread_mutex_unlock(&(table->forks[philo->right_fork_id]));
 		
 		pthread_mutex_lock(&(table->meal_check));
@@ -117,6 +119,39 @@ int 	init_mutex(t_table *table)
 	return (0);
 }
 
+void	death_checker(t_table *table)
+{
+	int i;
+
+	while ((table->all_ate) == 0)
+	{
+		i = 0;
+		while (i < table->nb_philo && ((table->smbd_has_died) == 0))
+		{	
+			pthread_mutex_lock(&(table->meal_check));
+			if (time_diff(table->philosophers[i].time_of_last_meal, timestamp()) > table->time_to_die)
+			{
+				pthread_mutex_lock(&(table->writing));
+				printf("last meal %lld\n", table->philosophers[i].time_of_last_meal);
+				printf("timestamp %lld\n", timestamp());
+				printf("time_to_die %d\n", table->time_to_die);
+				printf("philo number %d has died 💀\n", table->philosophers[i].id);
+				pthread_mutex_unlock(&(table->meal_check));
+				pthread_mutex_unlock(&(table->writing));
+				table->smbd_has_died = 1;
+				break;
+			}
+			pthread_mutex_unlock(&(table->meal_check));
+			usleep(100);
+			i++;
+			if (i == table->number_of_times_each_philosopher_must_eat)
+				table->all_ate = 1;
+		}
+		if (table->smbd_has_died)
+			break;
+	}
+}
+
 int 	init_all_philosophers(t_table *table)
 {
 	int i;
@@ -153,11 +188,12 @@ int 	init_all_philosophers(t_table *table)
         }
         i++;
     }
+	death_checker(table);
 	// on join tout les threads
 	for (i = 0; i < table->nb_philo; i++) {
         pthread_join(table->philosophers[i].thread_id, NULL);
     }
-    printf("threads terminated");
+    printf("threads terminated\n");
     return (0);
 }
 
@@ -165,7 +201,7 @@ int 	init_all_philosophers(t_table *table)
 void 	init_table(t_table *table, char **av)
 {
 	table->nb_philo = ft_atoi(av[1]);
-	table->time_to_die = ft_atoi(av[2]);
+	table->time_to_die = ft_atoi(av[2]) * 1000;
 	table->time_to_eat = ft_atoi(av[3]);
 	table->time_to_sleep = ft_atoi(av[4]);
 	if (av[5])

@@ -6,7 +6,7 @@
 /*   By: agtshiba <agtshiba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 16:16:50 by agtshiba          #+#    #+#             */
-/*   Updated: 2024/09/23 16:42:44 by agtshiba         ###   ########.fr       */
+/*   Updated: 2024/09/24 17:12:58 by agtshiba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,11 +130,6 @@ long long	timestamp(void)
 	gettimeofday(&t, NULL);
 	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
 }
-
-// void 	print_starting_time(void)
-// {
-// 	printf("the starting time is : %lld\n\n\n", timestamp());
-// }
 
 void print_starting_time(void)
 {
