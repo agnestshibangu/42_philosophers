@@ -34,6 +34,7 @@ typedef struct		s_philo
 
 typedef struct		s_table
 {
+	long long start_time;
 	int 	nb_philo;
 	int 	time_to_die;
 	int 	time_to_eat;
@@ -66,7 +67,12 @@ void 	*philo_eat(t_table *table, t_philo *philo);
 void	philo_sleep(t_table *table, t_philo *philo);
 void	philo_think(t_table *table, t_philo *philo);
 void 	init_table(t_table *table, char **av);
-long long	timestamp(void);
+
+
+long long init_starttime();
+
+long long gettimestamp(t_table *table);
+
 void	death_checker(t_table *table);
 long long 	time_diff(long long past, long long present);
 void print_starting_time(void);

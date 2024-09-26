@@ -123,13 +123,36 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-long long	timestamp(void)
+long long init_starttime()
 {
-	struct timeval	t;
-
-	gettimeofday(&t, NULL);
-	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
+	long long start_time;
+	struct timeval tv;
+	
+	start_time = 0;
+	gettimeofday(&tv, NULL);
+	start_time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+	return (start_time);
 }
+
+long long gettimestamp(t_table *table)
+{
+	struct timeval tv;
+	long long start_time;
+
+	start_time = table->start_time;
+
+	gettimeofday(&tv, NULL);
+	long long current_time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+	return (current_time - start_time);
+}
+
+// long long	timestamp(void)
+// {
+// 	struct timeval	t;
+
+// 	gettimeofday(&t, NULL);
+// 	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
+// }
 
 void print_starting_time(void)
 {
@@ -165,10 +188,10 @@ void	smart_sleep(long long time, t_table *table)
 {
 	long long i;
 	
-	i = timestamp();
+	i = gettimestamp(table);
 	while (!(table->smbd_has_died))
 	{
-		if (time_diff(i, timestamp()) >= time)
+		if (time_diff(i, gettimestamp(table)) >= time)
 			break;
 		usleep(50);
 	}

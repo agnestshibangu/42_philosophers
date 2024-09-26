@@ -12,10 +12,10 @@ void 	*p_thread(void *void_args)
 	table = args->table;
 	philo = args->philo;
 
-	while (i < table->number_of_times_each_philosopher_must_eat && !(table->smbd_has_died))
+	while (i < table->number_of_times_each_philosopher_must_eat)
 	{
-		if ((table->smbd_has_died) || (table->all_ate))
-			break;
+		// if ((table->smbd_has_died))
+		// 	break;
 		philo_eat(table, philo);
 		philo_sleep(table, philo);
 		philo_think(table, philo);
@@ -45,11 +45,15 @@ void 	*philo_eat(t_table *table, t_philo *philo)
 		pthread_mutex_unlock(&(table->forks[philo->left_fork_id]));
 		
 		pthread_mutex_lock(&(table->meal_check));
-		philo->time_of_last_meal = timestamp();
+		philo->time_of_last_meal = gettimestamp(table);
 		philo->how_many_times_eat += 1;
 		pthread_mutex_unlock(&(table->meal_check));
 
 		pthread_mutex_lock(&(table->writing));
+		pthread_mutex_lock(&(table->meal_check));
+		printf("philo number %d last time of eating %lld \n", philo->id, philo->time_of_last_meal);
+		pthread_mutex_unlock(&(table->meal_check));
+
 		printf("philo number %d has eat %d times \n", philo->id, philo->how_many_times_eat);
 		pthread_mutex_unlock(&(table->writing));
 
@@ -72,11 +76,15 @@ void 	*philo_eat(t_table *table, t_philo *philo)
 		pthread_mutex_unlock(&(table->forks[philo->right_fork_id]));
 		
 		pthread_mutex_lock(&(table->meal_check));
-		philo->time_of_last_meal = timestamp();
+		philo->time_of_last_meal = gettimestamp(table);
 		philo->how_many_times_eat += 1;
 		pthread_mutex_unlock(&(table->meal_check));
 		
 		pthread_mutex_lock(&(table->writing));
+		pthread_mutex_lock(&(table->meal_check));
+		printf("philo number %d last time of eating %lld \n", philo->id, philo->time_of_last_meal);
+		pthread_mutex_unlock(&(table->meal_check));
+
 		printf("philo number %d has eat %d times\n", philo->id, philo->how_many_times_eat);
 		pthread_mutex_unlock(&(table->writing));
 	}
@@ -123,32 +131,51 @@ void	death_checker(t_table *table)
 {
 	int i;
 
-	while ((table->all_ate) == 0)
+	while (!(table->all_ate))
 	{
-		i = 0;
-		while (i < table->nb_philo && ((table->smbd_has_died) == 0))
+		i = -1;
+		while (++i < table->nb_philo)
 		{	
 			pthread_mutex_lock(&(table->meal_check));
-			if (time_diff(table->philosophers[i].time_of_last_meal, timestamp()) > table->time_to_die)
+			
+			// Calculate time since the last meal
+			long long current_time = gettimestamp(table);
+			long long time_since_last_meal = current_time - table->philosophers[i].time_of_last_meal;
+
+			// Debugging print to check the values
+			pthread_mutex_lock(&(table->writing));
+			printf("Philosopher %d: Current Time: %lld, Last Meal Time: %lld, Time Since Last Meal: %lld, Time to Die: %d\n",
+			       table->philosophers[i].id, current_time, table->philosophers[i].time_of_last_meal, time_since_last_meal, table->time_to_die);
+			pthread_mutex_unlock(&(table->writing));
+
+			// Check if the philosopher should die
+			if (time_since_last_meal > table->time_to_die)
 			{
 				pthread_mutex_lock(&(table->writing));
-				printf("last meal %lld\n", table->philosophers[i].time_of_last_meal);
-				printf("timestamp %lld\n", timestamp());
-				printf("time_to_die %d\n", table->time_to_die);
 				printf("philo number %d has died 💀\n", table->philosophers[i].id);
 				pthread_mutex_unlock(&(table->meal_check));
 				pthread_mutex_unlock(&(table->writing));
+				
+				pthread_mutex_lock(&(table->meal_check));
 				table->smbd_has_died = 1;
+				pthread_mutex_unlock(&(table->meal_check));
 				break;
 			}
 			pthread_mutex_unlock(&(table->meal_check));
 			usleep(100);
-			i++;
-			if (i == table->number_of_times_each_philosopher_must_eat)
-				table->all_ate = 1;
 		}
 		if (table->smbd_has_died)
 			break;
+		i = 0;
+		while (i < table->nb_philo && table->philosophers[i].how_many_times_eat >= table->number_of_times_each_philosopher_must_eat)
+			i++;
+		if (i == table->nb_philo)
+		{
+			table->all_ate = 1;
+			pthread_mutex_lock(&(table->writing));
+			printf("EVERYBODY ATEEEEEEE !!!!!!\n");
+			pthread_mutex_unlock(&(table->writing));
+		}
 	}
 }
 
@@ -163,6 +190,7 @@ int 	init_all_philosophers(t_table *table)
 
 	while (i < table->nb_philo)
 	{
+
 		table->philosophers[i].id = i + 1;
 		table->philosophers[i].how_many_times_eat = 0;
 		table->philosophers[i].right_fork_id = i;
@@ -200,8 +228,9 @@ int 	init_all_philosophers(t_table *table)
 
 void 	init_table(t_table *table, char **av)
 {
+	table->start_time = init_starttime();
 	table->nb_philo = ft_atoi(av[1]);
-	table->time_to_die = ft_atoi(av[2]) * 1000;
+	table->time_to_die = ft_atoi(av[2]);
 	table->time_to_eat = ft_atoi(av[3]);
 	table->time_to_sleep = ft_atoi(av[4]);
 	if (av[5])
