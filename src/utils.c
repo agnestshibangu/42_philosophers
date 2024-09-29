@@ -146,14 +146,6 @@ long long gettimestamp(t_table *table)
 	return (current_time - start_time);
 }
 
-// long long	timestamp(void)
-// {
-// 	struct timeval	t;
-
-// 	gettimeofday(&t, NULL);
-// 	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
-// }
-
 void print_starting_time(void)
 {
 	time_t raw_time;
@@ -184,10 +176,10 @@ long long 	time_diff(long long past, long long present)
 	return (present - past);
 }
 
-void	smart_sleep(long long time, t_table *table)
+void 	smart_sleep(long long time, t_table *table)
 {
 	long long i;
-	
+
 	i = gettimestamp(table);
 	while (!(table->smbd_has_died))
 	{
@@ -195,4 +187,6 @@ void	smart_sleep(long long time, t_table *table)
 			break;
 		usleep(50);
 	}
+
+
 }

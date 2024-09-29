@@ -64,7 +64,8 @@ void 	*philo_routine(t_table *table);
 int 	init_mutex(t_table *table);
 int 	init_all_philosophers(t_table *table);
 void 	*philo_eat(t_table *table, t_philo *philo);
-void	philo_sleep(t_table *table, t_philo *philo);
+// void	philo_sleep(t_table *table, t_philo *philo);
+void		philo_sleep(t_table *table);
 void	philo_think(t_table *table, t_philo *philo);
 void 	init_table(t_table *table, char **av);
 
@@ -72,11 +73,18 @@ void 	init_table(t_table *table, char **av);
 long long init_starttime();
 
 long long gettimestamp(t_table *table);
+void *monitor_philosophers(void *void_table);
 
-void	death_checker(t_table *table);
+
+// void	death_checker(t_table *table);
 long long 	time_diff(long long past, long long present);
 void print_starting_time(void);
 void print_finishing_time(void);
+
+void 	smart_sleep(long long time, t_table *table);
+
+
+void	print_last_meal_times(t_table *table);
 // static size_t	calculate_size(long number);
 
 

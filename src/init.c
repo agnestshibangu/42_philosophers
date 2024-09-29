@@ -14,10 +14,10 @@ void 	*p_thread(void *void_args)
 
 	while (i < table->number_of_times_each_philosopher_must_eat)
 	{
-		// if ((table->smbd_has_died))
-		// 	break;
+		if ((table->smbd_has_died))
+			break;
 		philo_eat(table, philo);
-		philo_sleep(table, philo);
+		philo_sleep(table);
 		philo_think(table, philo);
 		i++;
 	}	
@@ -43,11 +43,14 @@ void 	*philo_eat(t_table *table, t_philo *philo)
 		pthread_mutex_unlock(&(table->writing));
 		pthread_mutex_unlock(&(table->forks[philo->right_fork_id]));
 		pthread_mutex_unlock(&(table->forks[philo->left_fork_id]));
+
 		
 		pthread_mutex_lock(&(table->meal_check));
 		philo->time_of_last_meal = gettimestamp(table);
-		philo->how_many_times_eat += 1;
 		pthread_mutex_unlock(&(table->meal_check));
+		smart_sleep(table->time_to_eat, table);
+
+		philo->how_many_times_eat += 1;
 
 		pthread_mutex_lock(&(table->writing));
 		pthread_mutex_lock(&(table->meal_check));
@@ -77,8 +80,10 @@ void 	*philo_eat(t_table *table, t_philo *philo)
 		
 		pthread_mutex_lock(&(table->meal_check));
 		philo->time_of_last_meal = gettimestamp(table);
-		philo->how_many_times_eat += 1;
 		pthread_mutex_unlock(&(table->meal_check));
+		smart_sleep(table->time_to_eat, table);
+
+		philo->how_many_times_eat += 1;
 		
 		pthread_mutex_lock(&(table->writing));
 		pthread_mutex_lock(&(table->meal_check));
@@ -92,14 +97,11 @@ void 	*philo_eat(t_table *table, t_philo *philo)
 }
 
 
-
-void		philo_sleep(t_table *table, t_philo *philo)
+void		philo_sleep(t_table *table)
 {
-	pthread_mutex_lock(&(table->writing));
-	printf("philo number %d is sleeping 🛏\n\n", philo->id);
-	pthread_mutex_unlock(&(table->writing));
-	usleep(1500000);
+	smart_sleep(table->time_to_sleep, table);
 }
+
 
 void		philo_think(t_table *table, t_philo *philo)
 {
@@ -127,6 +129,24 @@ int 	init_mutex(t_table *table)
 	return (0);
 }
 
+
+void	print_last_meal_times(t_table *table)
+{
+	int i;
+
+	i = 0;
+	while (i < table->nb_philo)
+	{
+		pthread_mutex_lock(&(table->writing));
+		pthread_mutex_lock(&(table->meal_check)); // Lock to protect access to time_of_last_meal
+		printf("Philosopher %d: Last Meal TIME: %lld\n\n",
+			table->philosophers[i].id, table->philosophers[i].time_of_last_meal);
+		pthread_mutex_unlock(&(table->meal_check)); // Unlock after accessing time_of_last_meal
+		pthread_mutex_unlock(&(table->writing));
+		i++;
+	}
+}
+
 void	death_checker(t_table *table)
 {
 	int i;
@@ -135,25 +155,23 @@ void	death_checker(t_table *table)
 	{
 		i = -1;
 		while (++i < table->nb_philo)
-		{	
-			pthread_mutex_lock(&(table->meal_check));
-			
-			// Calculate time since the last meal
+		{
 			long long current_time = gettimestamp(table);
+			pthread_mutex_lock(&(table->meal_check));
 			long long time_since_last_meal = current_time - table->philosophers[i].time_of_last_meal;
+			pthread_mutex_unlock(&(table->meal_check));
 
 			// Debugging print to check the values
-			pthread_mutex_lock(&(table->writing));
-			printf("Philosopher %d: Current Time: %lld, Last Meal Time: %lld, Time Since Last Meal: %lld, Time to Die: %d\n",
-			       table->philosophers[i].id, current_time, table->philosophers[i].time_of_last_meal, time_since_last_meal, table->time_to_die);
-			pthread_mutex_unlock(&(table->writing));
+			// pthread_mutex_lock(&(table->writing));
+			// printf("Philosopher %d: Current Time: %lld, Last Meal Time: %lld, Time Since Last Meal: %lld, Time to Die: %d\n",
+			//        table->philosophers[i].id, current_time, table->philosophers[i].time_of_last_meal, time_since_last_meal, table->time_to_die);
+			// pthread_mutex_unlock(&(table->writing));
 
-			// Check if the philosopher should die
 			if (time_since_last_meal > table->time_to_die)
 			{
 				pthread_mutex_lock(&(table->writing));
 				printf("philo number %d has died 💀\n", table->philosophers[i].id);
-				pthread_mutex_unlock(&(table->meal_check));
+				//pthread_mutex_unlock(&(table->meal_check));
 				pthread_mutex_unlock(&(table->writing));
 				
 				pthread_mutex_lock(&(table->meal_check));
@@ -179,6 +197,17 @@ void	death_checker(t_table *table)
 	}
 }
 
+void *monitor_philosophers(void *void_table) {
+    t_table *table = (t_table *)void_table;
+    while (1) {
+		death_checker(table);
+        usleep(100);
+    }
+    return NULL;
+}
+
+
+
 int 	init_all_philosophers(t_table *table)
 {
 	int i;
@@ -190,7 +219,6 @@ int 	init_all_philosophers(t_table *table)
 
 	while (i < table->nb_philo)
 	{
-
 		table->philosophers[i].id = i + 1;
 		table->philosophers[i].how_many_times_eat = 0;
 		table->philosophers[i].right_fork_id = i;
@@ -216,7 +244,12 @@ int 	init_all_philosophers(t_table *table)
         }
         i++;
     }
-	death_checker(table);
+	pthread_t monitor_thread;
+    if (pthread_create(&monitor_thread, NULL, monitor_philosophers, (void *)table)) {
+        return (1);
+    }
+	// death_checker(table);
+	//print_last_meal_times(table);
 	// on join tout les threads
 	for (i = 0; i < table->nb_philo; i++) {
         pthread_join(table->philosophers[i].thread_id, NULL);
