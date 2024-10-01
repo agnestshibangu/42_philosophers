@@ -12,6 +12,19 @@ void 	*p_thread(void *void_args)
 	table = args->table;
 	philo = args->philo;
 
+	if (table->number_of_times_each_philosopher_must_eat == 0)
+	{
+		while (1)
+		{
+				if ((table->smbd_has_died))
+			break;
+		philo_eat(table, philo);
+		philo_sleep(table);
+		philo_think(table, philo);
+		i++;
+		}
+	}
+
 	while (i < table->number_of_times_each_philosopher_must_eat)
 	{
 		if ((table->smbd_has_died))
@@ -50,7 +63,9 @@ void 	*philo_eat(t_table *table, t_philo *philo)
 		pthread_mutex_unlock(&(table->meal_check));
 		smart_sleep(table->time_to_eat, table);
 
+		pthread_mutex_lock(&(table->meal_check));
 		philo->how_many_times_eat += 1;
+		pthread_mutex_unlock(&(table->meal_check));
 
 		pthread_mutex_lock(&(table->writing));
 		pthread_mutex_lock(&(table->meal_check));
@@ -83,8 +98,10 @@ void 	*philo_eat(t_table *table, t_philo *philo)
 		pthread_mutex_unlock(&(table->meal_check));
 		smart_sleep(table->time_to_eat, table);
 
+		pthread_mutex_lock(&(table->meal_check));
 		philo->how_many_times_eat += 1;
-		
+		pthread_mutex_unlock(&(table->meal_check));
+
 		pthread_mutex_lock(&(table->writing));
 		pthread_mutex_lock(&(table->meal_check));
 		printf("philo number %d last time of eating %lld \n", philo->id, philo->time_of_last_meal);
@@ -179,11 +196,18 @@ void	death_checker(t_table *table)
 				pthread_mutex_unlock(&(table->meal_check));
 				break;
 			}
-			pthread_mutex_unlock(&(table->meal_check));
+			// pthread_mutex_unlock(&(table->meal_check));
 			usleep(100);
 		}
+
+		pthread_mutex_lock(&(table->meal_check));
 		if (table->smbd_has_died)
+		{
+			pthread_mutex_unlock(&(table->meal_check));
 			break;
+		}
+		pthread_mutex_unlock(&(table->meal_check));
+
 		i = 0;
 		while (i < table->nb_philo && table->philosophers[i].how_many_times_eat >= table->number_of_times_each_philosopher_must_eat)
 			i++;
@@ -268,6 +292,8 @@ void 	init_table(t_table *table, char **av)
 	table->time_to_sleep = ft_atoi(av[4]);
 	if (av[5])
 		table->number_of_times_each_philosopher_must_eat = ft_atoi(av[5]);
+	else
+		table->number_of_times_each_philosopher_must_eat = 0;
 	table->all_ate = 0;
 	table->smbd_has_died = 0;
 }
