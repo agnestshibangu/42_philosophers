@@ -6,7 +6,7 @@
 /*   By: agtshiba <agtshiba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:46:37 by agtshiba          #+#    #+#             */
-/*   Updated: 2024/09/24 15:06:50 by agtshiba         ###   ########.fr       */
+/*   Updated: 2024/10/02 11:50:56 by agtshiba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,11 +56,15 @@ typedef struct s_thread_args
 	t_table	*table;
 }	t_thread_args;
 
+
 int	ft_atoi(char *str);
 char	*ft_itoa(int n);
 char	*ft_strjoin(char const *s1, char const *s2);
 size_t	ft_strlen(const char *s);
-void 	*philo_routine(t_table *table);
+
+void 	philosopher_routine(t_table *table, t_philo *philo);
+void 	action_print(t_table *table, int i, char *string);
+
 int 	init_mutex(t_table *table);
 int 	init_all_philosophers(t_table *table);
 void 	*philo_eat(t_table *table, t_philo *philo);
