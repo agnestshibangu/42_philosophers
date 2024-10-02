@@ -36,6 +36,16 @@ void 	philosopher_routine(t_table *table, t_philo *philo)
 
 // void 	action_print(t_table *table, int i, char *string)
 // {
+// 	time_t raw_time;
+// 	struct tm *time_info;
+// 	char buffer[80];
+
+// 	time(&raw_time);
+// 	time_info = localtime(&raw_time);
+// 	strftime(buffer, 80, "%H:%M:%S - %d/%m/%Y", time_info);
+// 	printf("Le programme a commencé à : %s\n\n", buffer);
+
+
 // 	pthread_mutex_lock(&(table->writing));
 // 	if (!(table->smbd_has_died))
 // 	{
@@ -47,26 +57,28 @@ void 	philosopher_routine(t_table *table, t_philo *philo)
 // 	return;
 // }
 
-
 void action_print(t_table *table, int i, char *string) {
-    pthread_mutex_lock(&(table->writing));
-    
-    if (!(table->smbd_has_died)) {
-        long long elapsed_time = gettimestamp(table) - table->start_time;
 
-        // Convert elapsed time to hours, minutes, and seconds
-        long hours = elapsed_time / 3600000; // Assuming elapsed time is in milliseconds
-        long minutes = (elapsed_time % 3600000) / 60000;
-        long seconds = (elapsed_time % 60000) / 1000;
+	pthread_mutex_lock(&(table->writing));
 
-        // Print the formatted time
-        printf("[%02ld:%02ld:%02ld] ", hours, minutes, seconds);
+	if (!(table->smbd_has_died))
+	{
+        time_t raw_time;
+        struct tm *time_info;
+        char buffer[80];
+
+        time(&raw_time);
+        time_info = localtime(&raw_time);
+
+		strftime(buffer, sizeof(buffer), "%H:%M:%S - %d/%m/%Y", time_info);
+
+        printf("[%s] ", buffer);
         printf("philo %d: %s\n", i, string);
     }
-
     pthread_mutex_unlock(&(table->writing));
-    return;
 }
+
+
 
 void 	*philo_eat(t_table *table, t_philo *philo)
 {	
