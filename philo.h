@@ -6,7 +6,7 @@
 /*   By: agtshiba <agtshiba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:46:37 by agtshiba          #+#    #+#             */
-/*   Updated: 2024/10/02 11:50:56 by agtshiba         ###   ########.fr       */
+/*   Updated: 2024/10/02 18:18:50 by agtshiba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,8 @@ int 	init_mutex(t_table *table);
 int 	init_all_philosophers(t_table *table);
 void 	*philo_eat(t_table *table, t_philo *philo);
 // void	philo_sleep(t_table *table, t_philo *philo);
-void		philo_sleep(t_table *table);
+void		philo_sleep(t_table *table, t_philo *philo);
+// void		philo_sleep(t_table *table);
 void	philo_think(t_table *table, t_philo *philo);
 void 	init_table(t_table *table, char **av);
 
@@ -81,9 +82,11 @@ void *monitor_philosophers(void *void_table);
 
 
 // void	death_checker(t_table *table);
-long long 	time_diff(long long past, long long present);
-void print_starting_time(void);
-void print_finishing_time(void);
+// long long 	time_diff(long long past, long long present);
+// void print_starting_time(void);
+// void print_finishing_time(void);
+void print_time(const char *message);
+// void join_and_terminate(t_table *table);
 
 void 	smart_sleep(long long time, t_table *table);
 

@@ -25,8 +25,8 @@ void 	philosopher_routine(t_table *table, t_philo *philo)
 		if (table->smbd_has_died)
 			break;
 		philo_eat(table, philo);
-		philo_sleep(table);
-		philo_think(table, philo);
+		philo_sleep(table, philo);
+		action_print(table, philo->id, " is thinking");
 		i++;
 		if (table->number_of_times_each_philosopher_must_eat > 0 && 
 			i >= table->number_of_times_each_philosopher_must_eat)
@@ -34,141 +34,45 @@ void 	philosopher_routine(t_table *table, t_philo *philo)
 	}
 }
 
-// void 	action_print(t_table *table, int i, char *string)
-// {
-// 	time_t raw_time;
-// 	struct tm *time_info;
-// 	char buffer[80];
-
-// 	time(&raw_time);
-// 	time_info = localtime(&raw_time);
-// 	strftime(buffer, 80, "%H:%M:%S - %d/%m/%Y", time_info);
-// 	printf("Le programme a commencé à : %s\n\n", buffer);
-
-
-// 	pthread_mutex_lock(&(table->writing));
-// 	if (!(table->smbd_has_died))
-// 	{
-// 		printf("%lli", gettimestamp(table) - table->start_time);
-// 		printf("philo %d", i);
-// 		printf("%s\n", string);
-// 	}
-// 	pthread_mutex_unlock(&(table->writing));
-// 	return;
-// }
-
-void action_print(t_table *table, int i, char *string) {
-
-	pthread_mutex_lock(&(table->writing));
-
-	if (!(table->smbd_has_died))
-	{
-        time_t raw_time;
-        struct tm *time_info;
-        char buffer[80];
-
-        time(&raw_time);
-        time_info = localtime(&raw_time);
-
-		strftime(buffer, sizeof(buffer), "%H:%M:%S - %d/%m/%Y", time_info);
-
-        printf("[%s] ", buffer);
-        printf("philo %d: %s\n", i, string);
-    }
-    pthread_mutex_unlock(&(table->writing));
-}
-
-
-
 void 	*philo_eat(t_table *table, t_philo *philo)
 {	
 	if (philo->id % 2 == 0)
 	{
-		// FOURCHETTE DE DROITE
 		pthread_mutex_lock(&(table->forks[philo->right_fork_id]));
 		action_print(table, philo->id, " has taken a fork");
-
-		// pthread_mutex_lock(&(table->writing));
-		// printf("philo number %d a la fourchette DROITE n %d\n", philo->id, philo->right_fork_id);
-		// pthread_mutex_unlock(&(table->writing));
-
-		// FOURCHETTE DE GAUCHE
 		pthread_mutex_lock(&(table->forks[philo->left_fork_id]));
-		pthread_mutex_lock(&(table->writing));
-		printf("philo number %d a la fourchette GAUCHE n %d\n", philo->id, philo->left_fork_id);
-		printf("philo number %d is eating\n", philo->id);
-		pthread_mutex_unlock(&(table->writing));
+		action_print(table, philo->id, " has taken a fork");
+		action_print(table, philo->id, " is eating");
 		pthread_mutex_unlock(&(table->forks[philo->right_fork_id]));
 		pthread_mutex_unlock(&(table->forks[philo->left_fork_id]));
-
-		
 		pthread_mutex_lock(&(table->meal_check));
 		philo->time_of_last_meal = gettimestamp(table);
-		pthread_mutex_unlock(&(table->meal_check));
-		smart_sleep(table->time_to_eat, table);
-
-		pthread_mutex_lock(&(table->meal_check));
 		philo->how_many_times_eat += 1;
 		pthread_mutex_unlock(&(table->meal_check));
-
-		pthread_mutex_lock(&(table->writing));
-		pthread_mutex_lock(&(table->meal_check));
-		printf("philo number %d last time of eating %lld \n", philo->id, philo->time_of_last_meal);
-		pthread_mutex_unlock(&(table->meal_check));
-
-		printf("philo number %d has eat %d times \n", philo->id, philo->how_many_times_eat);
-		pthread_mutex_unlock(&(table->writing));
-
+		smart_sleep(table->time_to_eat, table);
 	}
 	else if (philo->id == table->nb_philo - 1 || philo->id % 2 != 0)
 	{
-		// FOURCHETTE DE GAUCHE
 		pthread_mutex_lock(&(table->forks[philo->left_fork_id]));
-		pthread_mutex_lock(&(table->writing));
-		printf("philo number %d a la fourchette GAUCHE n %d\n", philo->id, philo->left_fork_id);
-		pthread_mutex_unlock(&(table->writing));
-
-		// FOURCHETTE DE DROITE
+		action_print(table, philo->id, " has taken a fork");
 		pthread_mutex_lock(&(table->forks[philo->right_fork_id]));
-		pthread_mutex_lock(&(table->writing));
-		printf("philo number %d a la fourchette DROITE n %d\n", philo->id, philo->right_fork_id);
-		printf("philo number %d is eating\n", philo->id);
-		pthread_mutex_unlock(&(table->writing));
-		pthread_mutex_unlock(&(table->forks[philo->left_fork_id]));
+		action_print(table, philo->id, " has taken a fork");
+		action_print(table, philo->id, " is eating");
 		pthread_mutex_unlock(&(table->forks[philo->right_fork_id]));
-		
+		pthread_mutex_unlock(&(table->forks[philo->left_fork_id]));
 		pthread_mutex_lock(&(table->meal_check));
 		philo->time_of_last_meal = gettimestamp(table);
-		pthread_mutex_unlock(&(table->meal_check));
-		smart_sleep(table->time_to_eat, table);
-
-		pthread_mutex_lock(&(table->meal_check));
 		philo->how_many_times_eat += 1;
 		pthread_mutex_unlock(&(table->meal_check));
-
-		pthread_mutex_lock(&(table->writing));
-		pthread_mutex_lock(&(table->meal_check));
-		printf("philo number %d last time of eating %lld \n", philo->id, philo->time_of_last_meal);
-		pthread_mutex_unlock(&(table->meal_check));
-
-		printf("philo number %d has eat %d times\n", philo->id, philo->how_many_times_eat);
-		pthread_mutex_unlock(&(table->writing));
+		smart_sleep(table->time_to_eat, table);
 	}
 	return (NULL);
 }
 
-
-void		philo_sleep(t_table *table)
+void		philo_sleep(t_table *table, t_philo *philo)
 {
+	action_print(table, philo->id, " is sleeping");
 	smart_sleep(table->time_to_sleep, table);
-}
-
-
-void		philo_think(t_table *table, t_philo *philo)
-{
-	pthread_mutex_lock(&(table->writing));
-	printf("philo number %d is thinking 🧘\n\n", philo->id);
-	pthread_mutex_unlock(&(table->writing));
 }
 
 
@@ -190,7 +94,6 @@ int 	init_mutex(t_table *table)
 	return (0);
 }
 
-
 void	print_last_meal_times(t_table *table)
 {
 	int i;
@@ -199,10 +102,10 @@ void	print_last_meal_times(t_table *table)
 	while (i < table->nb_philo)
 	{
 		pthread_mutex_lock(&(table->writing));
-		pthread_mutex_lock(&(table->meal_check)); // Lock to protect access to time_of_last_meal
+		pthread_mutex_lock(&(table->meal_check));
 		printf("Philosopher %d: Last Meal TIME: %lld\n\n",
 			table->philosophers[i].id, table->philosophers[i].time_of_last_meal);
-		pthread_mutex_unlock(&(table->meal_check)); // Unlock after accessing time_of_last_meal
+		pthread_mutex_unlock(&(table->meal_check));
 		pthread_mutex_unlock(&(table->writing));
 		i++;
 	}
@@ -218,32 +121,21 @@ void	death_checker(t_table *table)
 		while (++i < table->nb_philo)
 		{
 			long long current_time = gettimestamp(table);
+			
 			pthread_mutex_lock(&(table->meal_check));
 			long long time_since_last_meal = current_time - table->philosophers[i].time_of_last_meal;
 			pthread_mutex_unlock(&(table->meal_check));
 
-			// Debugging print to check the values
-			// pthread_mutex_lock(&(table->writing));
-			// printf("Philosopher %d: Current Time: %lld, Last Meal Time: %lld, Time Since Last Meal: %lld, Time to Die: %d\n",
-			//        table->philosophers[i].id, current_time, table->philosophers[i].time_of_last_meal, time_since_last_meal, table->time_to_die);
-			// pthread_mutex_unlock(&(table->writing));
-
 			if (time_since_last_meal > table->time_to_die)
 			{
-				pthread_mutex_lock(&(table->writing));
-				printf("philo number %d has died 💀\n", table->philosophers[i].id);
-				//pthread_mutex_unlock(&(table->meal_check));
-				pthread_mutex_unlock(&(table->writing));
-				
+				action_print(table, table->philosophers[i].id, " is dead 💀 \n");
 				pthread_mutex_lock(&(table->meal_check));
 				table->smbd_has_died = 1;
 				pthread_mutex_unlock(&(table->meal_check));
 				break;
 			}
-			// pthread_mutex_unlock(&(table->meal_check));
 			usleep(100);
 		}
-
 		pthread_mutex_lock(&(table->meal_check));
 		if (table->smbd_has_died)
 		{
@@ -251,9 +143,7 @@ void	death_checker(t_table *table)
 			break;
 		}
 		pthread_mutex_unlock(&(table->meal_check));
-
 		i = 0;
-
 		pthread_mutex_lock(&(table->meal_check));
 		while (i < table->nb_philo && table->philosophers[i].how_many_times_eat >= table->number_of_times_each_philosopher_must_eat)
 			i++;
@@ -278,8 +168,6 @@ void *monitor_philosophers(void *void_table) {
     return NULL;
 }
 
-
-
 int 	init_all_philosophers(t_table *table)
 {
 	int i;
@@ -288,6 +176,13 @@ int 	init_all_philosophers(t_table *table)
 
 	i = 0;
 	tab = "threadid";
+
+	if (table->nb_philo == 1)
+	{
+		action_print(table, table->philosophers[i].id, " has taken a fork");
+		action_print(table, table->philosophers[i].id, " is dead 💀 \n");
+		return 0;
+	}
 
 	while (i < table->nb_philo)
 	{
@@ -320,16 +215,12 @@ int 	init_all_philosophers(t_table *table)
     if (pthread_create(&monitor_thread, NULL, monitor_philosophers, (void *)table)) {
         return (1);
     }
-	// death_checker(table);
-	//print_last_meal_times(table);
-	// on join tout les threads
 	for (i = 0; i < table->nb_philo; i++) {
         pthread_join(table->philosophers[i].thread_id, NULL);
     }
     printf("threads terminated\n");
     return (0);
 }
-
 
 void 	init_table(t_table *table, char **av)
 {
