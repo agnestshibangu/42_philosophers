@@ -6,40 +6,40 @@
 /*   By: agtshiba <agtshiba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 11:23:55 by agtshiba          #+#    #+#             */
-/*   Updated: 2024/10/03 11:39:13 by agtshiba         ###   ########.fr       */
+/*   Updated: 2024/10/03 17:14:32 by agtshiba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-void 	look_for_death(t_table *table)
+void	look_for_death(t_table *table)
 {
-	int i;
+	long long	curr_t;
+	long long	t_last_meal;
+	int			i;
 
 	i = -1;
 	while (++i < table->nb_philo)
 	{
-		long long current_time = gettimestamp(table);
-		
 		pthread_mutex_lock(&(table->meal_check));
-		long long time_since_last_meal = current_time - table->philosophers[i].time_of_last_meal;
+		t_last_meal = curr_t - table->philoso[i].time_of_last_meal;
 		pthread_mutex_unlock(&(table->meal_check));
-
-		if (time_since_last_meal > table->time_to_die)
+		curr_t = gettimestamp(table);
+		if (t_last_meal > table->time_to_die)
 		{
-			action_print(table, table->philosophers[i].id, " is dead 💀 \n");
+			action_print(table, table->philoso[i].id, " is dead 💀 \n");
 			pthread_mutex_lock(&(table->meal_check));
 			table->smbd_has_died = 1;
 			pthread_mutex_unlock(&(table->meal_check));
-			break;
+			break ;
 		}
 		usleep(100);
-	}	
+	}
 }
 
 void	death_checker(t_table *table)
 {
-	int i;
+	int	i;
 
 	while (!(table->all_ate))
 	{
@@ -48,12 +48,13 @@ void	death_checker(t_table *table)
 		if (table->smbd_has_died)
 		{
 			pthread_mutex_unlock(&(table->meal_check));
-			break;
+			break ;
 		}
 		pthread_mutex_unlock(&(table->meal_check));
 		i = 0;
 		pthread_mutex_lock(&(table->meal_check));
-		while (i < table->nb_philo && table->philosophers[i].how_many_times_eat >= table->number_of_times_each_philosopher_must_eat)
+		while (i < table->nb_philo
+			&& table->philoso[i].how_many_times_eat >= table->nb_must_eat)
 			i++;
 		pthread_mutex_unlock(&(table->meal_check));
 		if (i == table->nb_philo)
@@ -61,12 +62,15 @@ void	death_checker(t_table *table)
 	}
 }
 
-void *monitor_philosophers(void *void_table) 
+void	*moni_philo(void *void_table)
 {
-    t_table *table = (t_table *)void_table;
-    while (1) {
+	t_table	*table;
+
+	table = (t_table *)void_table;
+	while (1)
+	{
 		death_checker(table);
-        usleep(100);
-    }
-    return NULL;
+		usleep(100);
+	}
+	return (NULL);
 }
