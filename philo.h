@@ -6,7 +6,7 @@
 /*   By: agtshiba <agtshiba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:46:37 by agtshiba          #+#    #+#             */
-/*   Updated: 2024/10/03 11:31:24 by agtshiba         ###   ########.fr       */
+/*   Updated: 2024/10/03 14:26:59 by agtshiba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,7 @@ void 	smart_sleep(long long time, t_table *table);
 
 
 void	print_last_meal_times(t_table *table);
+void 	free_table(t_table *table);
 // static size_t	calculate_size(long number);
 
 
