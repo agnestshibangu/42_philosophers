@@ -6,7 +6,7 @@
 /*   By: agtshiba <agtshiba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 15:46:37 by agtshiba          #+#    #+#             */
-/*   Updated: 2024/10/02 18:18:50 by agtshiba         ###   ########.fr       */
+/*   Updated: 2024/10/03 11:31:24 by agtshiba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,15 +66,26 @@ void 	philosopher_routine(t_table *table, t_philo *philo);
 void 	action_print(t_table *table, int i, char *string);
 
 int 	init_mutex(t_table *table);
-int 	init_all_philosophers(t_table *table);
 void 	*philo_eat(t_table *table, t_philo *philo);
+void *philo_eat_even(t_table *table, t_philo *philo) ;
+void *philo_eat_odd(t_table *table, t_philo *philo);
+
 // void	philo_sleep(t_table *table, t_philo *philo);
 void		philo_sleep(t_table *table, t_philo *philo);
 // void		philo_sleep(t_table *table);
 void	philo_think(t_table *table, t_philo *philo);
 void 	init_table(t_table *table, char **av);
+void init_philos(t_table *table);
 
+int 	c_d_philo_threads(t_table *table);
+// int		init_all_philosophers(t_table *table);
+int 	create_philos_threads(t_table *table);
 
+void 	look_for_death(t_table *table);
+void 	*p_thread(void *void_args);
+void join_philosopher_threads(t_table *table);
+
+void 	philosopher_routine(t_table *table, t_philo *philo);
 long long init_starttime();
 
 long long gettimestamp(t_table *table);

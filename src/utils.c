@@ -6,7 +6,7 @@
 /*   By: agtshiba <agtshiba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 16:16:50 by agtshiba          #+#    #+#             */
-/*   Updated: 2024/10/02 18:09:34 by agtshiba         ###   ########.fr       */
+/*   Updated: 2024/10/03 11:16:06 by agtshiba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,14 @@ long long gettimestamp(t_table *table)
 
 void print_time(const char *message)
 {
-    time_t raw_time;
-    struct tm *time_info;
-    char buffer[80];
+	time_t raw_time;
+	struct tm *time_info;
+	char buffer[80];
 
-    time(&raw_time);
-    time_info = localtime(&raw_time);
-    strftime(buffer, sizeof(buffer), "%H:%M:%S - %d/%m/%Y", time_info);
-    printf("%s: %s\n", message, buffer);
+	time(&raw_time);
+	time_info = localtime(&raw_time);
+	strftime(buffer, sizeof(buffer), "%H:%M:%S - %d/%m/%Y", time_info);
+	printf("%s: %s\n", message, buffer);
 }
 
 void 	smart_sleep(long long time, t_table *table)
@@ -63,8 +63,8 @@ void 	smart_sleep(long long time, t_table *table)
 void action_print(t_table *table, int i, char *string)
 {
 	struct timeval tv;
-    gettimeofday(&tv, NULL);
-    long long current_time = tv.tv_sec * 1000LL + tv.tv_usec / 1000;
+	gettimeofday(&tv, NULL);
+	long long current_time = tv.tv_sec * 1000LL + tv.tv_usec / 1000;
 
 	pthread_mutex_lock(&(table->writing));
 	if (!(table->smbd_has_died))
