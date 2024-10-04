@@ -6,7 +6,7 @@
 /*   By: agtshiba <agtshiba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 16:16:50 by agtshiba          #+#    #+#             */
-/*   Updated: 2024/10/03 17:31:43 by agtshiba         ###   ########.fr       */
+/*   Updated: 2024/10/03 18:17:46 by agtshiba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ long long	gettimestamp(t_table *table)
 	start_time = table->start_time;
 	gettimeofday(&tv, NULL);
 	current_time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+	//return (current_time);
 	return (current_time - start_time);
 }
 
