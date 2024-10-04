@@ -6,7 +6,7 @@
 /*   By: agtshiba <agtshiba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 11:23:55 by agtshiba          #+#    #+#             */
-/*   Updated: 2024/10/04 12:22:44 by agtshiba         ###   ########.fr       */
+/*   Updated: 2024/10/04 14:47:06 by agtshiba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void	death_checker(t_table *table)
 			&& table->philoso[i].how_many_times_eat >= table->nb_must_eat)
 			i++;
 		pthread_mutex_unlock(&(table->meal_check));
-		if (i == table->nb_philo)
+		if (i == table->nb_philo && table->nb_must_eat != 0)
 			table->all_ate = 1;
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: agtshiba <agtshiba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 18:08:43 by agtshiba          #+#    #+#             */
-/*   Updated: 2024/10/04 11:57:03 by agtshiba         ###   ########.fr       */
+/*   Updated: 2024/10/04 15:06:50 by agtshiba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ void	philosopher_routine(t_table *table, t_philo *philo)
 	}
 	while (1)
 	{
-		
 		if (check_smbd_has_died)
 			break ;
 		philo_eat(table, philo);
@@ -55,6 +54,9 @@ void	philosopher_routine(t_table *table, t_philo *philo)
 		if (table->nb_must_eat > 0
 			&& i >= table->nb_must_eat)
 			break ;
+		pthread_mutex_lock(&(table->meal_check));
+		check_smbd_has_died = table->smbd_has_died;
+		pthread_mutex_unlock(&(table->meal_check));
 	}
 }
 
