@@ -6,7 +6,7 @@
 /*   By: agtshiba <agtshiba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 18:08:43 by agtshiba          #+#    #+#             */
-/*   Updated: 2024/10/03 17:24:51 by agtshiba         ###   ########.fr       */
+/*   Updated: 2024/10/04 11:57:03 by agtshiba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,11 @@ void	*p_thread(void *void_args)
 void	philosopher_routine(t_table *table, t_philo *philo)
 {
 	int	i;
+	int check_smbd_has_died;
+
+	pthread_mutex_lock(&(table->meal_check));
+	check_smbd_has_died = table->smbd_has_died;
+	pthread_mutex_unlock(&(table->meal_check));
 
 	i = 0;
 	if (table->nb_philo == 1)
@@ -39,12 +44,13 @@ void	philosopher_routine(t_table *table, t_philo *philo)
 	}
 	while (1)
 	{
-		if (table->smbd_has_died)
+		
+		if (check_smbd_has_died)
 			break ;
 		philo_eat(table, philo);
-		action_print(table, philo->id, " is sleeping");
+		action_print(table, philo->id, "is sleeping");
 		smart_sleep(table->time_to_sleep, table);
-		action_print(table, philo->id, " is thinking");
+		action_print(table, philo->id, "is thinking");
 		i++;
 		if (table->nb_must_eat > 0
 			&& i >= table->nb_must_eat)
@@ -55,10 +61,10 @@ void	philosopher_routine(t_table *table, t_philo *philo)
 void	*philo_eat_even(t_table *table, t_philo *philo)
 {
 	pthread_mutex_lock(&(table->forks[philo->right_fork_id]));
-	action_print(table, philo->id, " has taken a fork");
+	action_print(table, philo->id, "has taken a fork");
 	pthread_mutex_lock(&(table->forks[philo->left_fork_id]));
-	action_print(table, philo->id, " has taken a fork");
-	action_print(table, philo->id, " is eating");
+	action_print(table, philo->id, "has taken a fork");
+	action_print(table, philo->id, "is eating");
 	pthread_mutex_lock(&(table->meal_check));
 	philo->time_of_last_meal = gettimestamp(table);
 	philo->how_many_times_eat += 1;
@@ -72,10 +78,10 @@ void	*philo_eat_even(t_table *table, t_philo *philo)
 void	*philo_eat_odd(t_table *table, t_philo *philo)
 {
 	pthread_mutex_lock(&(table->forks[philo->left_fork_id]));
-	action_print(table, philo->id, " has taken a fork");
+	action_print(table, philo->id, "has taken a fork");
 	pthread_mutex_lock(&(table->forks[philo->right_fork_id]));
-	action_print(table, philo->id, " has taken a fork");
-	action_print(table, philo->id, " is eating");
+	action_print(table, philo->id, "has taken a fork");
+	action_print(table, philo->id, "is eating");
 	pthread_mutex_lock(&(table->meal_check));
 	philo->time_of_last_meal = gettimestamp(table);
 	philo->how_many_times_eat += 1;

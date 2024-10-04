@@ -6,7 +6,7 @@
 /*   By: agtshiba <agtshiba@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 11:23:55 by agtshiba          #+#    #+#             */
-/*   Updated: 2024/10/03 17:14:32 by agtshiba         ###   ########.fr       */
+/*   Updated: 2024/10/04 12:22:44 by agtshiba         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@ void	look_for_death(t_table *table)
 	i = -1;
 	while (++i < table->nb_philo)
 	{
+		curr_t = gettimestamp(table);
 		pthread_mutex_lock(&(table->meal_check));
 		t_last_meal = curr_t - table->philoso[i].time_of_last_meal;
 		pthread_mutex_unlock(&(table->meal_check));
-		curr_t = gettimestamp(table);
 		if (t_last_meal > table->time_to_die)
 		{
 			action_print(table, table->philoso[i].id, " is dead 💀 \n");
