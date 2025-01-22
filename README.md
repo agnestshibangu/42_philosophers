@@ -1,4 +1,7 @@
-![Alt text](preview.png)
+
+<center>
+  ![Alt text](preview.png)
+</center>
 
 
 # Philosophers
