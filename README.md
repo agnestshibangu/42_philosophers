@@ -1,8 +1,4 @@
-
-
-<p style="text-align: center;">
-  <img src="preview.png" alt="Alt text" style="width: 300px;">
-</p>
+![Alt text](preview.png)
 
 # Philosophers
 
