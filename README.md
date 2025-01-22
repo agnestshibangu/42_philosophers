@@ -1,11 +1,7 @@
 
-<center>
-  ![Alt text](preview.png)
-</center>
-
-<p style="text-align: center;">
-    ![Alt text](preview.png)
-</p>
+<div style="text-align: center;">
+  <img src="preview.png" alt="Alt text">
+</div>
 
 # Philosophers
 
